@@ -20,6 +20,7 @@
 @property (nonatomic, strong) NSString *dsym_uuid;
 @property (nonatomic, strong) NSString *base_address;
 @property (nonatomic, strong) NSString *top_controller;
+@property (nonatomic, strong) NSString *executable_name;
 @property (nonatomic, strong) NSString *page_views_stack_info;
 
 @end

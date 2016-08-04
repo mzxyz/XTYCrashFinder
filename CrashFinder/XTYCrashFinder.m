@@ -12,6 +12,7 @@
 #import <mach-o/loader.h>
 #import <mach-o/dyld.h>
 #include <execinfo.h>
+#import "XTYCrashFinderItem.h"
 
 
 /** Signal Key*/
@@ -35,27 +36,20 @@ static NSString *dsym_uuid;
 
 @implementation XTYCrashFinder
 
-+ (void)uploadCrashLogFileToServerWithCrashInfo:(MFWJson *)crashInfo crashLogFilePath:(NSString *)crashLogFilePath
++ (void)uploadCrashLogFileToServerWithCrashInfo:(NSString *)crashInfo crashLogFilePath:(NSString *)crashLogFilePath
 {
-    if ([crashLogFilePath length] && crashInfo)
+    if ([crashLogFilePath length] && [crashInfo length] > 0)
     {
-        MFWJson *crashListJson = [MFWJson jsonWithObject:@[crashInfo.jsonObj]];
-        [MFWCrashHunter uploadCrashLogFileToServerWithCrashInfo:crashListJson crashLogFilePathList:@[crashLogFilePath]];
+        [XTYCrashFinder uploadCrashLogFileToServerWithCrashInfo:@[crashInfo] crashLogFilePathList:@[crashLogFilePath]];
     }
 }
 
-+ (void)uploadCrashLogFileToServerWithCrashInfo:(MFWJson *)crashInfo crashLogFilePathList:(NSArray<NSString *> *)crashLogFilePathList
++ (void)uploadCrashLogFileToServerWithCrashInfo:(NSArray<NSString *> *)crashInfo crashLogFilePathList:(NSArray<NSString *> *)crashLogFilePathList
 {
-    NSString *apiUrl = @"https://mapi.mafengwo.cn/travelguide/tools/crashlogs";
-    [TGMAPIClient requestAPIUrl:apiUrl
-                 withParameters:@{@"crash_list":crashInfo.stringJson}
-                     httpMethod:MFWRequestHttpMethodPost
-                completionBlock:^(MFWHttpDataTask *task, BOOL succeed, MFWJson *jsonData, NSError *error) {
-                    if (!error)
-                    {
-                        [MFWCrashHunter deleteCrashLogFileList:crashLogFilePathList];
-                    }
-                }];
+    /**
+     *  you should upload the crashInfo to the server in this class method and 
+     *  delete the crashInfoFile after returning sucess through method [XTYCrashFinder deleteCrashLogFileList:crashLogFilePathList];
+     */
 }
 
 + (void)uploadAllCrashLogFilesToServer
@@ -65,7 +59,7 @@ static NSString *dsym_uuid;
     NSArray *crashFilesList = [crashDirectoryEnumerator allObjects];
     NSString *crashLogsDir = CrachLogDir;
     
-    WEAKREF(crashFilesList);
+    __weak NSArray *wcrashFilesList = crashFilesList;
     if ([crashFilesList count])
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -75,17 +69,17 @@ static NSString *dsym_uuid;
             for (NSString *crashLogFileName in wcrashFilesList)
             {
                 NSString *crashLogFilePath = [NSString stringWithFormat:@"%@/%@", crashLogsDir, crashLogFileName];
-                NSString *crashInfo = [[NSString alloc] initWithContentsOfFile:crashLogFilePath encoding:NSUTF8StringEncoding error:nil];
+                NSString *crashInfo = [NSString stringWithContentsOfURL:[NSURL URLWithString:crashLogFilePath] encoding:NSUTF8StringEncoding error:nil];
                 
                 if ([crashInfo length])
                 {
-                    MFWJson *crashJsonInfo = [MFWJson jsonWithString:crashInfo];
-                    [crashLogList addObject:crashJsonInfo.jsonObj];
+                    /**it is better to convert crashInfo to json*/
+                    [crashLogList addObject:crashInfo];
                     [crashLogFilePathList addObject:crashLogFilePath];
                 }
             }
-            MFWJson *crashListJson = [MFWJson jsonWithObject:crashLogList];
-            [MFWCrashHunter uploadCrashLogFileToServerWithCrashInfo:crashListJson crashLogFilePathList:crashLogFilePathList];
+            
+            [XTYCrashFinder uploadCrashLogFileToServerWithCrashInfo:crashLogList crashLogFilePathList:crashLogFilePathList];
         });
     }
 }
@@ -93,28 +87,30 @@ static NSString *dsym_uuid;
 static BOOL s_hasCrashed = NO;
 + (void)handleException:(NSException *)exception
 {
-    if (MFWInstalled)
+    if (XTYInstalled)
     {
         UIDevice *device = [UIDevice currentDevice];
         NSString *UUIDStr = [device identifierForVendor].UUIDString;
         NSString *crashDate = [NSString stringWithFormat:@"%ld",(long)[[NSDate date] timeIntervalSince1970]];
         NSString *crashId = [NSString stringWithFormat:@"%@_%@", UUIDStr, crashDate];
-        if (![dsym_uuid length]) {dsym_uuid = [MFWCrashHunter getDSYMUUID];}
+        if (![dsym_uuid length]) {dsym_uuid = [XTYCrashFinder getDSYMUUID];}
         
         NSString *executableName = [[NSBundle mainBundle] infoDictionary][(__bridge_transfer NSString *)kCFBundleExecutableKey];
         
-        MFWCrashInfoItem *crashInfoItem = [[MFWCrashInfoItem alloc] init];
+        XTYCrashFinderItem *crashInfoItem = [[XTYCrashFinderItem alloc] init];
         crashInfoItem.executable_name = executableName;
         crashInfoItem.title = [exception reason];
-        crashInfoItem.app_ver = [MFWCrashHunter appVersion];
+        crashInfoItem.app_ver = [XTYCrashFinder appVersion];
         crashInfoItem.crash_id = crashId;
         crashInfoItem.crash_name = [exception name];
         crashInfoItem.crash_time = crashDate;
-        crashInfoItem.page_name = [MFWClick currentVisiablePagename];
         crashInfoItem.dsym_uuid = dsym_uuid;
-        crashInfoItem.base_address = [MFWCrashHunter getBaseAddress];
-        crashInfoItem.top_controller = NSStringFromClass([AppCurrentNavigationController.topViewController class]);
-        crashInfoItem.page_views_stack_info = [[MFWJson jsonWithObject:[MFWClick getTopNPageStack:5]] stringJson];
+        crashInfoItem.base_address = [XTYCrashFinder getBaseAddress];
+        
+        /**add by yourself*/
+        crashInfoItem.page_name = nil;
+        crashInfoItem.top_controller = nil;
+        crashInfoItem.page_views_stack_info = nil;
         
         NSString *signalReason = [[exception userInfo] valueForKey:UncaughtExceptionHandlerSignalExceptionStackInfo];
         if ([signalReason length])
@@ -128,16 +124,18 @@ static BOOL s_hasCrashed = NO;
         }
         
 #ifdef DEBUG
-        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:crashInfoItem.title
-                                                            message:crashInfoItem.stack_info
-                                                           delegate:self
-                                                  cancelButtonTitle:@"退下吧"
-                                                  otherButtonTitles:nil, nil];
-        [alertView performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
+        UIAlertController *alController = [UIAlertController alertControllerWithTitle:crashInfoItem.title
+                                                                              message:crashInfoItem.stack_info
+                                                                       preferredStyle:UIAlertControllerStyleAlert];
+        [alController performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:YES];
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            exit(0);
+        }];
 #endif
         
-        // 一次app启动捕获一次crash信息
-        @synchronized([MFWCrashHunter class]) {
+        /**each crash info save to file only once*/
+        @synchronized([XTYCrashFinder class]) {
             if (s_hasCrashed == NO) {
                 s_hasCrashed = YES;
             }
@@ -146,16 +144,22 @@ static BOOL s_hasCrashed = NO;
             }
         }
         
-        [crashInfoItem rebuildJsonFromProperties];
-        [MFWCrashHunter saveCrashInfo:crashInfoItem.json crashId:crashId];
+        [XTYCrashFinder saveCrashInfo:[XTYCrashFinder crashItemChangeToString:crashInfoItem] crashId:crashId];
     }
+}
+
++ (NSString *)crashItemChangeToString:(XTYCrashFinderItem *)crashItem
+{
+    /**you should translate crashItem to json string*/
+    return nil;
 }
 
 + (BOOL)isSupport64bit
 {
-    int int_size =  sizeof(NSInteger);
+    int int_size = sizeof(NSInteger);
     
-    if (int_size != 8) {
+    if (int_size != 8)
+    {
         return NO;
     }
     
@@ -172,21 +176,26 @@ static BOOL s_hasCrashed = NO;
     
     NSString *executableName = [[NSBundle mainBundle] infoDictionary][(__bridge_transfer NSString *)kCFBundleExecutableKey];
     
-    @autoreleasepool {
-        for (NSString *s in originalCallStackSymbols) {
+    @autoreleasepool
+    {
+        for (NSString *s in originalCallStackSymbols)
+        {
             NSString *replaced = [s stringByReplacingOccurrencesOfString:@"([0-9]+?)(\\s*)([\\w\\.]+?)(\\s*?)(0x([0-9a-f])+)(\\s*)(.*?)(\\s*?)\\+(\\s*?)([0-9]+)(,)?" withString:@"$1$3$5$8$11" options:NSRegularExpressionSearch range:NSMakeRange(0, s.length)];
             
             NSArray *split = [replaced componentsSeparatedByString:@""];
             NSMutableString *convert_s = [[NSMutableString alloc] init];
             [split enumerateObjectsUsingBlock:^(NSString *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
                 BOOL conv = NO;
-                if (split.count == 5 && idx == 2 && [split[3] isEqualToString:executableName]) {
+                if (split.count == 5 && idx == 2 && [split[3] isEqualToString:executableName])
+                {
                     obj = [NSString stringWithFormat:@"0x%llx", [split[4] longLongValue]+0x100000000ll];
                     conv = YES;
                 }
-                else if (split.count == 5 && idx == 4) {
+                else if (split.count == 5 && idx == 4)
+                {
                     obj = [NSString stringWithFormat:@"+\t%@", obj];
                 }
+                
                 [convert_s appendFormat:@"%@%@%@", idx==0?@"":@"\t", obj, conv?@"\t(conv)":@""];
             }];
             
@@ -215,11 +224,14 @@ static BOOL s_hasCrashed = NO;
     const char *exec_utf8 = [executableName UTF8String];
     
     uint32_t numImages = _dyld_image_count();
-    for (uint32_t i = 0; i < numImages; i++) {
+    for (uint32_t i = 0; i < numImages; i++)
+    {
         const struct mach_header *header = _dyld_get_image_header(i);
         const char *name = _dyld_get_image_name(i);
         const char *p = strrchr(name, '/');
-        if (p && (strcmp(p + 1, exec_utf8) == 0)) {
+        
+        if (p && (strcmp(p + 1, exec_utf8) == 0))
+        {
             return [NSString stringWithFormat:@"%@ %p", executableName, header];
         }
     }
@@ -257,7 +269,7 @@ static BOOL s_hasCrashed = NO;
     return nil;
 }
 
-+ (void)saveCrashInfo:(MFWJson *)crashInfo crashId:(NSString *)crashId
++ (void)saveCrashInfo:(NSString *)crashInfo crashId:(NSString *)crashId
 {
     /** save crash info*/
     BOOL isDir = NO;
@@ -270,12 +282,9 @@ static BOOL s_hasCrashed = NO;
     }
     
     NSString *crashFilePath = [NSString stringWithFormat:@"%@/MFWCrash_%@.log", crashDir, crashId];
-    [crashInfo.stringJson writeToFile:crashFilePath
-                           atomically:YES
-                             encoding:NSUTF8StringEncoding
-                                error:nil];
+    [crashInfo writeToFile:crashFilePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     
-    [MFWCrashHunter uploadCrashLogFileToServerWithCrashInfo:crashInfo crashLogFilePath:crashFilePath];
+    [XTYCrashFinder uploadCrashLogFileToServerWithCrashInfo:crashInfo crashLogFilePath:crashFilePath];
 }
 
 + (void)deleteCrashLogFileList:(NSArray<NSString *> *)crashLogFilePathList
@@ -285,14 +294,6 @@ static BOOL s_hasCrashed = NO;
     {
         [fileManager removeItemAtPath:filePath error:nil];
     }
-}
-
-#pragma mark - UIAlertViewDelegate
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    [UIView animateWithDuration:0.5 animations:^{
-        exit(0);
-    }];
 }
 
 #pragma mark - signal
@@ -360,7 +361,6 @@ static NSString * xty_signal_SignalStrForSignal(const int sigNum)
 /* number of signals in the fatal signals list */
 static int monitored_signals_count = (sizeof(monitored_signals) / sizeof(monitored_signals[0]));
 
-
 /**
  *  Signal Catch Hander
  *
@@ -370,7 +370,14 @@ static void SignalHandle(int signal, siginfo_t* signalInfo, void* userContext)
 {
     /** 解析signalInfo
      NSString *signalInfoStr =
-     [NSString stringWithFormat:@"errno_association:%d\nsignal_code:%d\nsending_process:%d\faulting_instruction%ld\n", signalInfo->si_errno, signalInfo->si_code, signalInfo->si_pid,((uintptr_t)signalInfo->si_addr)];
+     [NSString stringWithFormat:@"errno_association:%d\n
+                                signal_code:%d\n
+                                sending_process:%d\n
+                                faulting_instruction%ld\n", 
+                                signalInfo->si_errno, 
+                                signalInfo->si_code, 
+                                signalInfo->si_pid,
+                                ((uintptr_t)signalInfo->si_addr)];
      */
     
     NSArray *stackSymbols = [XTYCrashFinder handleStackSymbols:[NSThread callStackSymbols]];
@@ -381,7 +388,7 @@ static void SignalHandle(int signal, siginfo_t* signalInfo, void* userContext)
                                                      reason:reason
                                                    userInfo:[NSDictionary dictionaryWithObject:stackInfo
                                                                                         forKey:UncaughtExceptionHandlerSignalExceptionStackInfo]];
-    [MFWCrashHunter handleException:exception];
+    [XTYCrashFinder handleException:exception];
 }
 
 static void uncaughtExceptionHandler(NSException *exception)
@@ -391,7 +398,7 @@ static void uncaughtExceptionHandler(NSException *exception)
 
 + (BOOL)installNSExceptionHandler
 {
-    if (MFWInstalled) return YES;
+    if (XTYInstalled) return YES;
     XTYInstalled = 1;
     
     [XTYCrashFinder installSignalHandlers];
