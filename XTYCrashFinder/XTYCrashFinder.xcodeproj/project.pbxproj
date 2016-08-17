@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A03A7FB1D64907B00C2FB67 /* XTYCrashFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A03A7F81D64907B00C2FB67 /* XTYCrashFinder.m */; };
+		7A03A7FC1D64907B00C2FB67 /* XTYCrashFinderItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A03A7FA1D64907B00C2FB67 /* XTYCrashFinderItem.m */; };
 		7A3005961D5238DD00A7B1A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3005951D5238DD00A7B1A4 /* main.m */; };
 		7A3005991D5238DD00A7B1A4 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3005981D5238DD00A7B1A4 /* AppDelegate.m */; };
 		7A30059C1D5238DD00A7B1A4 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A30059B1D5238DD00A7B1A4 /* MasterViewController.m */; };
@@ -16,8 +18,6 @@
 		7A3005A71D5238DD00A7B1A4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A3005A51D5238DD00A7B1A4 /* LaunchScreen.storyboard */; };
 		7A3005B21D5238DD00A7B1A4 /* XTYCrashFinderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3005B11D5238DD00A7B1A4 /* XTYCrashFinderTests.m */; };
 		7A3005BD1D5238DD00A7B1A4 /* XTYCrashFinderUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3005BC1D5238DD00A7B1A4 /* XTYCrashFinderUITests.m */; };
-		7A3005CE1D52395200A7B1A4 /* XTYCrashFinderItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3005CD1D52395200A7B1A4 /* XTYCrashFinderItem.m */; };
-		7A3005D11D52397C00A7B1A4 /* XTYCrashFinder.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3005D01D52397C00A7B1A4 /* XTYCrashFinder.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +38,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7A03A7F71D64907B00C2FB67 /* XTYCrashFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XTYCrashFinder.h; path = ../XTYCrashFinder.h; sourceTree = "<group>"; };
+		7A03A7F81D64907B00C2FB67 /* XTYCrashFinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XTYCrashFinder.m; path = ../XTYCrashFinder.m; sourceTree = "<group>"; };
+		7A03A7F91D64907B00C2FB67 /* XTYCrashFinderItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XTYCrashFinderItem.h; path = ../XTYCrashFinderItem.h; sourceTree = "<group>"; };
+		7A03A7FA1D64907B00C2FB67 /* XTYCrashFinderItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XTYCrashFinderItem.m; path = ../XTYCrashFinderItem.m; sourceTree = "<group>"; };
 		7A3005911D5238DD00A7B1A4 /* XTYCrashFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XTYCrashFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A3005951D5238DD00A7B1A4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7A3005971D5238DD00A7B1A4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -56,10 +60,6 @@
 		7A3005B81D5238DD00A7B1A4 /* XTYCrashFinderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XTYCrashFinderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A3005BC1D5238DD00A7B1A4 /* XTYCrashFinderUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XTYCrashFinderUITests.m; sourceTree = "<group>"; };
 		7A3005BE1D5238DD00A7B1A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7A3005CC1D52395200A7B1A4 /* XTYCrashFinderItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTYCrashFinderItem.h; sourceTree = "<group>"; };
-		7A3005CD1D52395200A7B1A4 /* XTYCrashFinderItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTYCrashFinderItem.m; sourceTree = "<group>"; };
-		7A3005CF1D52397C00A7B1A4 /* XTYCrashFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTYCrashFinder.h; sourceTree = "<group>"; };
-		7A3005D01D52397C00A7B1A4 /* XTYCrashFinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTYCrashFinder.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,10 +163,10 @@
 		7A3005CB1D52392E00A7B1A4 /* CrashFinder */ = {
 			isa = PBXGroup;
 			children = (
-				7A3005CC1D52395200A7B1A4 /* XTYCrashFinderItem.h */,
-				7A3005CD1D52395200A7B1A4 /* XTYCrashFinderItem.m */,
-				7A3005CF1D52397C00A7B1A4 /* XTYCrashFinder.h */,
-				7A3005D01D52397C00A7B1A4 /* XTYCrashFinder.m */,
+				7A03A7F71D64907B00C2FB67 /* XTYCrashFinder.h */,
+				7A03A7F81D64907B00C2FB67 /* XTYCrashFinder.m */,
+				7A03A7F91D64907B00C2FB67 /* XTYCrashFinderItem.h */,
+				7A03A7FA1D64907B00C2FB67 /* XTYCrashFinderItem.m */,
 			);
 			name = CrashFinder;
 			path = ../../CrashFinder;
@@ -303,11 +303,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				7A3005991D5238DD00A7B1A4 /* AppDelegate.m in Sources */,
-				7A3005D11D52397C00A7B1A4 /* XTYCrashFinder.m in Sources */,
 				7A30059C1D5238DD00A7B1A4 /* MasterViewController.m in Sources */,
 				7A3005961D5238DD00A7B1A4 /* main.m in Sources */,
+				7A03A7FB1D64907B00C2FB67 /* XTYCrashFinder.m in Sources */,
+				7A03A7FC1D64907B00C2FB67 /* XTYCrashFinderItem.m in Sources */,
 				7A30059F1D5238DD00A7B1A4 /* DetailViewController.m in Sources */,
-				7A3005CE1D52395200A7B1A4 /* XTYCrashFinderItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -531,6 +531,7 @@
 				7A3005C31D5238DD00A7B1A4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7A3005C41D5238DD00A7B1A4 /* Build configuration list for PBXNativeTarget "XTYCrashFinderTests" */ = {
 			isa = XCConfigurationList;
@@ -539,6 +540,7 @@
 				7A3005C61D5238DD00A7B1A4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7A3005C71D5238DD00A7B1A4 /* Build configuration list for PBXNativeTarget "XTYCrashFinderUITests" */ = {
 			isa = XCConfigurationList;
@@ -547,6 +549,7 @@
 				7A3005C91D5238DD00A7B1A4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
