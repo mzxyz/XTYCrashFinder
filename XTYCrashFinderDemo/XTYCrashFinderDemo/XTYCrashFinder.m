@@ -136,12 +136,11 @@ static BOOL s_hasCrashed = NO;
         
         /**each crash info save to file only once*/
         @synchronized([XTYCrashFinder class]) {
-            if (s_hasCrashed == NO) {
+            if (s_hasCrashed == NO)
+            {
                 s_hasCrashed = YES;
             }
-            else {
-                return;
-            }
+            else return;
         }
         
         [XTYCrashFinder saveCrashInfo:[XTYCrashFinder crashItemChangeToString:crashInfoItem] crashId:crashId];
