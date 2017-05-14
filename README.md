@@ -2,21 +2,21 @@
 It is a finder class used to collect the crash information of iOS app. The crash information contains the address array of error method, the detail information can  get from PSYM file.
 
 
-#Main features
+# Main features
 * Catching crash information all the time. Not only for debug status, but also for released apps.
 * The crash information combines with the current page information is stored as a file and also can upload to server for further processing.
 * Tester will be more effective to catch bugs with XTYCrashFinder.
 
-#Requirements
+# Requirements
 * iOS 6.0+ 
 * Xcode 6.1.1+
 
-#Installation
+# Installation
   * Move the `XTYCrashFinder and XTYCrashFinderItem ` into you project
   * Import `XTYCrashFinder.h` in AppDelegate.h 
 
-#API
-##Properties
+# API
+## Properties
 Properties like stack_info, dsym_uuid are used to tell you what the crash is. Properties like title, crash_id, crash_name are used to identify this crash. All these information will be stored as a file in local folder called `CrashLog` 
 
 ```
@@ -36,7 +36,7 @@ Properties like stack_info, dsym_uuid are used to tell you what the crash is. Pr
 
 
 
-##Method
+## Method
  *  Install the XTYCrashFinder, you should use this method  at the end of the `- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions` method. This is because some other third party library may also collect crash information after you install, so that they may hijack your crash information.
 
 ```
@@ -45,7 +45,7 @@ Properties like stack_info, dsym_uuid are used to tell you what the crash is. Pr
 
 ```
 
-#Usage
+# Usage
 it is very easy to use in your program, just install the XTYCrashFinder in the follow method :
 
 ```
@@ -104,5 +104,5 @@ This is the stack_info which crashFinder catch, we can find that the key crash r
 22	libdyld.dylib	0x000000010799d92d	start	+	1
 ```
 
-#License
+# License
 XTYCrashFinder is released under the MIT license. See LICENSE for details.
